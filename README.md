@@ -159,8 +159,6 @@ bash scripts/grm_sft.sh --max_train_samples 100
   title={Beyond Token-level Supervision: Unlocking the Potential of Decoding-based Regression via Reinforcement Learning},
   author={Chen, Ming and Tang, Sheng and Tan, Rong-Xi and Li, Ziniu and Chen, Jiacheng and Xue, Ke and Qian, Chao},
   booktitle={Proceedings of the 43rd International Conference on Machine Learning},
-  series={Proceedings of Machine Learning Research},
-  volume={306},
   address={Seoul, South Korea},
   year={2026}
 }
