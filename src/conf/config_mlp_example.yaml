@@ -1,0 +1,70 @@
+# @package _global_
+
+# MLP Encoder
+# MLP encoder
+
+# train.py arguments
+project_name: regress-lm-mlp-encoder
+experiment_name: regress-lm-mlp-${now:%Y-%m-%d_%H-%M-%S}
+use_wandb: false
+log_dir: logs
+seed: 42
+batch_size: 32
+num_epochs: 100
+learning_rate: 1e-4
+save_every_n_epochs: 10
+
+# Learning rate scheduler
+scheduler:
+  type: cosine
+  warmup_steps: 100
+  min_lr_ratio: 0.1
+
+# Model parameters - MLP encoder
+model:
+  max_input_len: 1024
+  max_num_objs: 1
+  d_model: 256
+  num_encoder_layers: 3
+  num_decoder_layers: 3
+  nhead: 4
+  dim_feedforward: 1024
+  dropout: 0.1
+
+  # MLP Encoder
+  encoder_type: "mlp"  # MLP encodervanilla transformer
+
+  # MLP encoder
+  #
+  input_dim: 42        #
+  hidden_dims: [256, 256]  # MLP
+  output_dim: 256      # d_model
+
+  # MLP
+  # hidden_dims: [64, 128, 256, 128, 64]  #
+  # hidden_dims: [512, 512]               #
+
+# Dataset parameters
+dataset:
+  name: "your-dataset-name"  #
+  path:
+    train: null
+    val: null
+  params:
+    data_dir: regression_data
+
+# checkpoint
+init_checkpoint: null
+
+# Other configurations
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+save_dir: outputs/mlp-encoder/${now:%Y-%m-%d}/${now:%H-%M-%S}/checkpoints
+if_ntl: false
+
+# input_dim
+# - input_dim =
+# - input_dim =
+# - input_dim =

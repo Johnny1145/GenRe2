@@ -1,0 +1,43 @@
+# RLM
+# test_rlm.py
+
+#
+hf:
+  enabled: true
+  model_name_or_path: "akhauriyash/RLM-GemmaS-Code-v0"
+  trust_remote_code: true
+
+#
+dataset:
+  name: "akhauriyash/Code-Regression"  # RLM
+  task: "apps"
+  sub_task: null
+  data_dir: data/code_metric
+
+#
+batch_size: 16
+learning_rate: 5e-6
+num_epochs: 100
+save_every_n_epochs: 2
+
+#
+grad_accum_steps: 1
+gradient_clipping: 1.0
+
+#
+mixed_precision: null  # "fp16"  "bf16"  null
+
+#
+experiment_name: "rlm_finetune"
+project_name: "rlm_code_regression"
+use_wandb: true
+seed: 42
+
+#
+num_decode_samples: 8  #
+decode_temperature: 1.0
+max_new_tokens: null  #
+
+save_dir: outputs/rlm_exp/${now:%Y-%m-%d}/${now:%H-%M-%S}/checkpoints
+
+init_checkpoint: null

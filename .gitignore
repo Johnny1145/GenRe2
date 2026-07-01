@@ -1,0 +1,48 @@
+# Python/runtime artifacts
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Local environments and editor state
+.venv/
+venv/
+env/
+.env
+.env.*
+.DS_Store
+
+# Experiment outputs, caches, and logs
+output/
+outputs/
+results/
+results_*/
+!results_optuna_ce/
+!results_optuna_ce/**/
+!results_optuna_ce/**/best_params.json
+checkpoints/
+wandb/
+swanlog/
+logs/
+cache/
+.cache/
+
+# Local data and generated evaluation files
+data/
+datasets/
+generated_feedback_dataset*.json
+*.jsonl
+*.npy
+*.npz
+
+# Model/checkpoint weights should be released through model repos, not this code repo.
+*.bin
+*.ckpt
+*.pt
+*.pth
+*.safetensors
+global_step*/
+pytorch_model/

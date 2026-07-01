@@ -1,0 +1,11 @@
+{
+  "learning_rate": 3.661205537166672e-05,
+  "base": 4,
+  "digits": 8,
+  "d_model": 128,
+  "nhead": 8,
+  "num_decoder_layers": 2,
+  "dim_feedforward": 512,
+  "hidden_dim": 512,
+  "dropout": 0.1
+}

@@ -1,0 +1,84 @@
+# @package _global_
+
+# MLP Encoder
+# MLP encoder
+
+# train.py arguments
+project_name: regress-lm-mlp-encoder
+experiment_name: regress-lm-mlp-${now:%Y-%m-%d_%H-%M-%S}
+use_wandb: false
+log_dir: logs
+seed: 42
+batch_size: 128
+num_epochs: 100
+learning_rate: 1e-5
+save_every_n_epochs: 10
+best_save_metric: "val_mean_reward" # val_lossval_mean_reward
+eval_mode: false
+skip_mode: false
+base: 2
+digits: 8
+# Learning rate scheduler
+scheduler:
+  type: cosine
+  warmup_steps: 100
+  min_lr_ratio: 0.1
+
+# Model parameters - MLP encoder
+model:
+  max_input_len: 1024
+  max_num_objs: 1
+  d_model: 256
+  num_encoder_layers: 3
+  num_decoder_layers: 3
+  nhead: 4
+  dim_feedforward: 1024
+  dropout: 0.1
+
+  # MLP Encoder
+  encoder_type: "mlp"  # MLP encodervanilla transformer
+
+  # MLP encoder
+  #
+  input_dim: 42        #
+  hidden_dims: [1024, 1024, 1024]  # MLP
+  output_dim: 256      # d_model
+
+  # MLP
+  # hidden_dims: [64, 128, 256, 128, 64]  #
+  # hidden_dims: [512, 512]               #
+
+reinforce:
+  enabled: true
+  temperature: 1.0  #
+  num_samples: 16    #
+  reward_scale: 1.0 # reward
+  epsilon: 1e-8
+  one_sided_norm: true
+  expert_ce_weight: 0.05
+
+# Dataset parameters
+dataset:
+  name: sjdlsjlk  #
+  path:
+    train: null
+    val: null
+  params:
+    data_dir: regression_data
+
+
+# checkpoint
+init_checkpoint: null
+
+# Other configurations
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+save_dir: outputs/mlp-encoder/${now:%Y-%m-%d}/${now:%H-%M-%S}/checkpoints
+if_ntl: false
+
+# input_dim
+# - input_dim =
+# - input_dim =
+# - input_dim =
