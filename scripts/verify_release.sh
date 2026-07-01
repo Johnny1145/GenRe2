@@ -16,6 +16,7 @@ test -f docs/exp1_task_filtering.md
 test -f docs/exp1_ce_optuna_best_params.csv
 test -f docs/exp1_resolved_hyperparameters.json
 test -f docs/exp1_search_hyperparameters_manifest.json
+test -f configs/accelerate_deepspeed_zero2.yaml
 python - <<'PY'
 from pathlib import Path
 import csv
@@ -24,6 +25,7 @@ import json
 readme = Path("README.md").read_text(encoding="utf-8")
 exp1 = Path("docs/exp1_model_architectures.md").read_text(encoding="utf-8")
 task_filtering = Path("docs/exp1_task_filtering.md").read_text(encoding="utf-8")
+accelerate_config = Path("configs/accelerate_deepspeed_zero2.yaml").read_text(encoding="utf-8")
 
 required_methods = [
     "Pointwise head baseline",
@@ -58,9 +60,13 @@ if missing_exp1_wrappers:
 required_readme_entries = [
     "## Environment installation",
     "## Main experiments",
+    "## Citation",
     "conda env create -f environment.yml",
     "pip install -r requirements.txt",
     "accelerate config",
+    "configs/accelerate_deepspeed_zero2.yaml",
+    "BATCH_SIZE=128",
+    "per-process DataLoader batch size",
     "TABULAR_DATA_DIR=/path/to/talent",
     "scripts/tabular_search_ce.sh",
     "scripts/tabular_genre2.sh",
@@ -69,10 +75,20 @@ required_readme_entries = [
     "GRM_MODEL=/path/to/sft_model",
     "scripts/grm_genre2.sh",
     "scripts/grm_eval.sh",
+    "Beyond Token-level Supervision",
+    "Proceedings of the 43rd International Conference on Machine Learning",
 ]
 missing_readme_entries = [entry for entry in required_readme_entries if entry not in readme]
 if missing_readme_entries:
     raise SystemExit(f"README is missing experiment/setup entries: {missing_readme_entries}")
+
+for required in [
+    "distributed_type: DEEPSPEED",
+    "zero_stage: 2",
+    "gradient_accumulation_steps: 1",
+]:
+    if required not in accelerate_config:
+        raise SystemExit(f"Accelerate config is missing: {required}")
 
 if "train_size <= 1000000000" not in task_filtering:
     raise SystemExit("Task filtering doc does not record the 100-task train_size rule.")
@@ -234,6 +250,24 @@ if [[ -n "${local_path_hits}" ]]; then
   exit 1
 fi
 echo "No local absolute paths found."
+
+echo "== Paper launch settings =="
+paper_tabular_cmd="$(
+  DRY_RUN=1 GPUS=0,1,2,3 NUM_PROCESSES=4 BATCH_SIZE=128 TABULAR_DATA_DIR=/tmp/talent \
+    bash scripts/tabular_genre2.sh Abalone_reg
+)"
+echo "${paper_tabular_cmd}"
+for required in \
+  "--config_file=" \
+  "configs/accelerate_deepspeed_zero2.yaml" \
+  "--num_processes=4" \
+  "batch_size=128"; do
+  if [[ "${paper_tabular_cmd}" != *"${required}"* ]]; then
+    echo "Tabular paper launch command is missing: ${required}" >&2
+    exit 1
+  fi
+done
+echo "Tabular paper launch settings are explicit."
 
 echo "== Wrapper dry-runs =="
 for wrapper in \

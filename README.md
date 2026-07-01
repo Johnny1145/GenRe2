@@ -24,6 +24,14 @@ training:
 accelerate config
 ```
 
+The release wrappers default to the checked-in DeepSpeed ZeRO-2 config:
+
+```bash
+export ACCELERATE_CONFIG=configs/accelerate_deepspeed_zero2.yaml
+```
+
+Set `ACCELERATE_CONFIG=` if you want to use your local accelerate default.
+
 Set data and model paths as needed:
 
 ```bash
@@ -36,6 +44,10 @@ export GRM_REF_MODEL=prometheus-eval/prometheus-8x7b-v2.0
 Use `DRY_RUN=1` to print the command without starting a run.
 
 ## Main experiments
+
+For `accelerate` jobs, `BATCH_SIZE` is passed directly to the training code and
+is the per-process DataLoader batch size. The tabular paper runs use
+`BATCH_SIZE=128` with 4 accelerate processes.
 
 Common runtime variables:
 
@@ -57,7 +69,7 @@ TABULAR_DATA_DIR=/path/to/talent N_TRIALS=25 \
 Run GenRe2:
 
 ```bash
-GPUS=0 NUM_PROCESSES=1 TABULAR_DATA_DIR=/path/to/talent \
+GPUS=0,1,2,3 NUM_PROCESSES=4 BATCH_SIZE=128 TABULAR_DATA_DIR=/path/to/talent \
   bash scripts/tabular_genre2.sh Abalone_reg
 ```
 
@@ -85,7 +97,7 @@ bash scripts/tabular_genre2.sh Abalone_reg init_checkpoint=/path/to/model.pt
 Run GenRe2 on APPS:
 
 ```bash
-GPUS=0,1,2,3 NUM_PROCESSES=4 RLM_DATA_DIR=/path/to/code_metric \
+GPUS=0,1,2,3,4,5,6,7 NUM_PROCESSES=8 RLM_DATA_DIR=/path/to/code_metric \
   bash scripts/rlm_genre2.sh apps
 ```
 
@@ -138,4 +150,18 @@ For a short GRM debug run:
 
 ```bash
 bash scripts/grm_sft.sh --max_train_samples 100
+```
+
+## Citation
+
+```bibtex
+@inproceedings{chen2026beyond,
+  title={Beyond Token-level Supervision: Unlocking the Potential of Decoding-based Regression via Reinforcement Learning},
+  author={Chen, Ming and Tang, Sheng and Tan, Rong-Xi and Li, Ziniu and Chen, Jiacheng and Xue, Ke and Qian, Chao},
+  booktitle={Proceedings of the 43rd International Conference on Machine Learning},
+  series={Proceedings of Machine Learning Research},
+  volume={306},
+  address={Seoul, South Korea},
+  year={2026}
+}
 ```

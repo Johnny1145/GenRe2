@@ -20,8 +20,12 @@ Usage:
 Common environment variables:
   GPUS                  Comma-separated GPU ids. Default: 0
   NUM_PROCESSES         Number of accelerate processes. Default: number of GPUS
+  ACCELERATE_CONFIG     Accelerate config. Default: configs/accelerate_deepspeed_zero2.yaml
+                        Set ACCELERATE_CONFIG= to use your local accelerate default.
   SEED                  Random seed. Default: 42
   OUTPUT_DIR            Output directory. Default: outputs/<mode>/<method>
+  BATCH_SIZE            Training batch size passed to the training code.
+                        For accelerate-launched jobs this is per process.
   MAX_ITEMS             Optional sample cap for smoke tests.
 
 Tabular environment variables:
@@ -45,25 +49,34 @@ shift 2
 
 GPUS="${GPUS:-0}"
 NUM_PROCESSES="${NUM_PROCESSES:-$(awk -F',' '{print NF}' <<<"${GPUS}")}"
+ACCELERATE_CONFIG="${ACCELERATE_CONFIG-configs/accelerate_deepspeed_zero2.yaml}"
 SEED="${SEED:-42}"
 OUTPUT_DIR="${OUTPUT_DIR:-outputs/${MODE}/${METHOD}}"
 PORT="${PORT:-12325}"
 
 run_accelerate() {
-  local cmd=(
-    env "CUDA_VISIBLE_DEVICES=${GPUS}" accelerate launch
+  local launch_args=(launch)
+  if [[ -n "${ACCELERATE_CONFIG}" ]]; then
+    if [[ ! -f "${ACCELERATE_CONFIG}" ]]; then
+      echo "ACCELERATE_CONFIG does not exist: ${ACCELERATE_CONFIG}" >&2
+      exit 2
+    fi
+    launch_args+=("--config_file=${ACCELERATE_CONFIG}")
+  fi
+  launch_args+=(
     "--num_processes=${NUM_PROCESSES}"
     "--main_process_port=${PORT}"
+  )
+  local cmd=(
+    env "CUDA_VISIBLE_DEVICES=${GPUS}" accelerate
+    "${launch_args[@]}"
     "$@"
   )
   if [[ "${DRY_RUN:-0}" == "1" ]]; then
     printf '%q ' "${cmd[@]}"
     printf '\n'
   else
-    CUDA_VISIBLE_DEVICES="${GPUS}" accelerate launch \
-      --num_processes="${NUM_PROCESSES}" \
-      --main_process_port="${PORT}" \
-      "$@"
+    CUDA_VISIBLE_DEVICES="${GPUS}" accelerate "${launch_args[@]}" "$@"
   fi
 }
 
