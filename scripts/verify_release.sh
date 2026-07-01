@@ -58,7 +58,7 @@ if missing_wrappers:
 if "scripts/grm_eval.sh" not in readme:
     raise SystemExit("README does not document the GRM eval wrapper.")
 
-if "Model weights are intentionally not part of this release scope." not in readme:
+if "No model weights are included." not in readme:
     raise SystemExit("README does not state the no-weight release scope.")
 
 for required in [
