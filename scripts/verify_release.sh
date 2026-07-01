@@ -51,25 +51,28 @@ required_wrappers = [
     "scripts/tabular_remax.sh",
     "scripts/tabular_genre2.sh",
 ]
-missing_wrappers = [wrapper for wrapper in required_wrappers if wrapper not in exp1 or wrapper not in readme]
-if missing_wrappers:
-    raise SystemExit(f"Missing Exp1 wrapper references: {missing_wrappers}")
+missing_exp1_wrappers = [wrapper for wrapper in required_wrappers if wrapper not in exp1]
+if missing_exp1_wrappers:
+    raise SystemExit(f"Missing Exp1 wrapper references: {missing_exp1_wrappers}")
 
-if "scripts/grm_eval.sh" not in readme:
-    raise SystemExit("README does not document the GRM eval wrapper.")
-
-if "No model weights are included." not in readme:
-    raise SystemExit("README does not state the no-weight release scope.")
-
-for required in [
-    "results_optuna_ce/<dataset>/<dataset>/best_params.json",
-    "docs/exp1_resolved_hyperparameters.json",
-    "docs/exp1_ce_optuna_best_params.csv",
-    "docs/exp1_search_hyperparameters_manifest.json",
-    "docs/exp1_task_filtering.md",
-]:
-    if required not in readme:
-        raise SystemExit(f"README does not document searched hyperparameter artifact: {required}")
+required_readme_entries = [
+    "## Environment installation",
+    "## Main experiments",
+    "conda env create -f environment.yml",
+    "pip install -r requirements.txt",
+    "accelerate config",
+    "TABULAR_DATA_DIR=/path/to/talent",
+    "scripts/tabular_search_ce.sh",
+    "scripts/tabular_genre2.sh",
+    "RLM_DATA_DIR=/path/to/code_metric",
+    "scripts/rlm_genre2.sh",
+    "GRM_MODEL=/path/to/sft_model",
+    "scripts/grm_genre2.sh",
+    "scripts/grm_eval.sh",
+]
+missing_readme_entries = [entry for entry in required_readme_entries if entry not in readme]
+if missing_readme_entries:
+    raise SystemExit(f"README is missing experiment/setup entries: {missing_readme_entries}")
 
 if "train_size <= 1000000000" not in task_filtering:
     raise SystemExit("Task filtering doc does not record the 100-task train_size rule.")
